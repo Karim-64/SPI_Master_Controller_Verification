@@ -40,21 +40,22 @@ class apb_sequence_item extends uvm_sequence_item;
     logic [31:0]  tx_word;
     logic [31:0]  PRDATA;
 
-    logic dut_PREADY;
-    logic dut_PSLVERR;
-    logic dut_cfg_en;
-    logic dut_cfg_mstr;
-    logic dut_cfg_lsb_first;
-    logic dut_cfg_loopback;
-    logic dut_tx_empty;
-    logic dut_IRQ;
-    logic [1:0]   dut_cfg_mode;
-    logic [1:0]   dut_cfg_width;
-    logic [3:0]   dut_SS_n;
-    logic [7:0]   dut_cfg_delay;
-    logic [15:0]  dut_cfg_clk_div;
-    logic [31:0]  dut_tx_word;
-    logic [31:0]  dut_PRDATA;
+    // expected signals from golden model
+    logic PREADY_expected;
+    logic PSLVERR_expected;
+    logic cfg_en_expected;
+    logic cfg_mstr_expected;
+    logic cfg_lsb_first_expected;
+    logic cfg_loopback_expected;
+    logic tx_empty_expected;
+    logic IRQ_expected;
+    logic [1:0]   cfg_mode_expected;
+    logic [1:0]   cfg_width_expected;
+    logic [3:0]   SS_n_expected;
+    logic [7:0]   cfg_delay_expected;
+    logic [15:0]  cfg_clk_div_expected;
+    logic [31:0]  tx_word_expected;
+    logic [31:0]  PRDATA_expected;
 
      
     function new(string name = "apb_sequence_item");
@@ -71,16 +72,16 @@ class apb_sequence_item extends uvm_sequence_item;
     logic flag = 1;
 
     function void pre_randomize();
-        if({oldPSEL,oldPENABLE} === 2'b11 || flag)
+        if({PSEL,PENABLE} === 2'b11 || flag)
         begin
             {newPSEL,newPENABLE} = 2'b00;
             flag =0;
         end
-        else if({oldPSEL,oldPENABLE} == 2'b10)
+        else if({PSEL,PENABLE} == 2'b10)
         begin
             {newPSEL,newPENABLE} = 2'b11;
         end
-        else if({oldPSEL,oldPENABLE} == 2'b00)
+        else if({PSEL,PENABLE} == 2'b00)
         begin
             {newPSEL,newPENABLE} = 2'b10;
         end
@@ -99,10 +100,12 @@ class apb_sequence_item extends uvm_sequence_item;
         PSEL == newPSEL;
         PENABLE == newPENABLE;
         PADDR[1:0] == 2'b0;     // make it 4 byte allgigned
+        if(!PRESETn) busy_in == 1'b0;   // added 
     }
 
     constraint ctrl_c{
         PRESETn dist {1:/90 , 0:/10};
+        PADDR == 8'h00;
         if({PSEL,PENABLE} == 2'b00)
         {
             PWRITE dist {1:/50 , 0:/50};    // PWRITE changes in idle state
@@ -116,8 +119,9 @@ class apb_sequence_item extends uvm_sequence_item;
         }
         else if({PSEL,PENABLE} == 2'b10 || {PSEL,PENABLE} == 2'b11)
         {
-            PWRITE == oldPWRITE;
-            PWDATA == oldPWDATA;                // PWDATA stable at setup and access states
+            PWDATA == oldPWDATA;
+            PADDR == oldPADDR;
+            PWRITE == oldPWRITE;               // PWDATA stable at setup and access states
         }
     }
 
@@ -126,7 +130,7 @@ class apb_sequence_item extends uvm_sequence_item;
         if({PSEL,PENABLE} == 2'b00)
         {
             PWRITE dist {1:/50 , 0:/50};
-            PADDR dist {8'h08:/50 , 8'h0c:/50};
+            PADDR dist {8'h08:/50 , 8'h0c:/50,[8'h24:$]:/5};
             PWDATA dist {
                 32'h00000000 :/ 40,
                 32'hFFFFFFFF :/ 40,
@@ -149,7 +153,6 @@ class apb_sequence_item extends uvm_sequence_item;
             32'hAAAAAAAA :/ 40,
             [32'h00000001 : 32'hFFFFFFFE] :/ 20
         };
-
     }
 
     constraint TX_FULL_OVF_c{
@@ -159,14 +162,23 @@ class apb_sequence_item extends uvm_sequence_item;
         if({PSEL,PENABLE} == 2'b10 || {PSEL,PENABLE} == 2'b11)
         {
             PWDATA == oldPWDATA;
+            PADDR == oldPADDR;
+            PWRITE == oldPWRITE;
         }
     }
     constraint TX_empty{
         PRESETn == 1;
-        tx_pop == 1;
         PWDATA == oldPWDATA;
         PADDR == oldPADDR;
+        PADDR != 8'h08;
         PWRITE == oldPWRITE;
+        if({PSEL,PENABLE} == 2'b11)
+        {
+            tx_pop == 1;
+        }
+        else{
+            tx_pop == 0;
+        }
     }
 
     constraint RX_EMPTY_c{
@@ -176,12 +188,13 @@ class apb_sequence_item extends uvm_sequence_item;
         if({PSEL,PENABLE} == 2'b10 || {PSEL,PENABLE} == 2'b11)
         {
             PWDATA == oldPWDATA;
+            PADDR == oldPADDR;
+            PWRITE == oldPWRITE;
         }
     }
 
     constraint RX_FULL_c{
         PRESETn == 1;
-        rx_push_valid == 1;
         rx_push_data dist {
             32'h00000000 :/ 40,
             32'hFFFFFFFF :/ 40,
@@ -189,8 +202,16 @@ class apb_sequence_item extends uvm_sequence_item;
             32'hAAAAAAAA :/ 40,
             [32'h00000001 : 32'hFFFFFFFE] :/ 20
         };
+        if({PSEL,PENABLE} == 2'b11)
+        {
+            rx_push_valid == 1;
+        }
+        else{
+            rx_push_valid == 0;
+        }
         PWDATA == oldPWDATA;
         PADDR == oldPADDR;
+        PADDR != 8'h08;
         PWRITE == oldPWRITE;
     }
 
@@ -202,6 +223,8 @@ class apb_sequence_item extends uvm_sequence_item;
         if({PSEL,PENABLE} == 2'b10 || {PSEL,PENABLE} == 2'b11)
         {
             PWDATA == oldPWDATA;
+            PADDR == oldPADDR;
+            PWRITE == oldPWRITE;
         }
     }
 
@@ -213,6 +236,7 @@ class apb_sequence_item extends uvm_sequence_item;
         if({PSEL,PENABLE} == 2'b11 || ({PSEL,PENABLE} == 2'b10))
         {
             PWDATA == oldPWDATA;
+            PADDR == oldPADDR;
             PWRITE == oldPWRITE;
         }
         else{
@@ -223,17 +247,18 @@ class apb_sequence_item extends uvm_sequence_item;
    constraint ss_ctrl_c{
         PRESETn dist {1:/90 , 0:/10};
         PADDR == 8'h14;
-        if(({oldPSEL,oldPENABLE} == 2'b11) || ({oldPSEL,oldPENABLE} == 2'b10))
+        if(({PSEL,PENABLE} == 2'b11) || ({PSEL,PENABLE} == 2'b10))
         {   
-            PWDATA == oldPWDATA;            // PWDATA stable at setup and access states
+            PWDATA == oldPWDATA;
+            PADDR == oldPADDR;
             PWRITE == oldPWRITE;
         }
-        else if({oldPSEL,oldPENABLE} == 2'b11)
+        else
         {   
             PWRITE dist {1:/90 , 0:/10};
             PWDATA[31:8] == 0;
 
-        PWDATA[7:0] dist {
+            PWDATA[7:0] dist {
 
             // no slave enabled
             8'b0000_0000 :/ 10,
@@ -263,69 +288,65 @@ class apb_sequence_item extends uvm_sequence_item;
         };
         }
     }
-     /*constraint int_en_tx_empty_c {
-          PADDR  == 8'h1C;
-        PWRITE == 1;
-        PWDATA == 32'h00000001;
+     constraint int_EN_c {
+        PRESETn dist {1:/90 , 0:/10};
+        PADDR  == 8'h18;
+       if(({PSEL,PENABLE} == 2'b11) || ({PSEL,PENABLE} == 2'b10))
+        {   
+            PWDATA == oldPWDATA;
+            PADDR == oldPADDR;
+            PWRITE == oldPWRITE;
+        }
+         else
+        {   
+            PWRITE dist {1:/90 , 0:/10};
+         PWDATA dist {
+            32'h00000000 :/ 10,   // enable TX_EMPTY interrupt
+            32'h00000001 :/ 10,   // enable TX_EMPTY interrupt
+           32'h00000002 :/ 10,   // enable RX_FULL interrupt
+           32'h00000004 :/ 10,   // enable TX_OVF interrupt
+           32'h00000008 :/ 10,   // enable RX_OVF interrupt
+           32'h00000010 :/ 10  // enable TRANSFER_DONE interrupt
+         };
+        }
     }
 
-    constraint int_en_rx_full_c {
+   
+    constraint clr_STAT_c {
+        PRESETn dist {1:/90 , 0:/10};
         PADDR  == 8'h1C;
-        PWRITE == 1;
-        PWDATA == 32'h00000002;
-    }
-     constraint int_en_tx_ovf_c {
-       PADDR  == 8'h1C;
-        PWRITE == 1;
-        PWDATA == 32'h00000004;
-    }
-    constraint int_en_rx_ovf_c {
-         PADDR  == 8'h1C;
-        PWRITE == 1;
-        PWDATA == 32'h00000008;
+        if(({PSEL,PENABLE} == 2'b11) || ({PSEL,PENABLE} == 2'b10))
+        {
+            PWDATA == oldPWDATA;
+            PADDR == oldPADDR;
+            PWRITE == oldPWRITE;
+        }
+         else
+        {   
+            PWRITE dist {1:/90 , 0:/10};
+       
+         PWDATA dist {
+            32'h00000001 :/ 10,   // clear TX_EMPTY interrupt
+           32'h00000002 :/ 10,   // clear RX_FULL interrupt
+           32'h00000004 :/ 10,   // clear TX_OVF interrupt
+           32'h00000008 :/ 10,   // clear RX_OVF interrupt
+           32'h00000010 :/ 10  // clear TRANSFER_DONE interrupt
+         };
+        }
     }
 
-     constraint int_en_transfer_done_c {
-          PADDR  == 8'h1C;
-        PWRITE == 1;
-        PWDATA == 32'h00000010;
-    }*/
-    constraint clr_tx_empty_c {
-        PADDR  == 8'h1C;
-        PWRITE == 1;
-        PWDATA == 32'h00000001;
-    }
-
-    constraint clr_rx_full_c {
-        PADDR  == 8'h1C;
-        PWRITE == 1;
-        PWDATA == 32'h00000002;
-    }
-    constraint clr_tx_ovf_c {
-        PADDR  == 8'h1C;
-        PWRITE == 1;
-        PWDATA == 32'h00000004;
-    }
-    constraint clr_rx_ovf_c {
-        PADDR  == 8'h1C;
-        PWRITE == 1;
-        PWDATA == 32'h00000008;
-    }
-    constraint clr_transfer_done_c {
-        PADDR  == 8'h1C;
-        PWRITE == 1;
-        PWDATA == 32'h00000010;
-    }
-    
+   
     constraint delay_c {
 
     PRESETn dist {1:/90 , 0:/10};
 
     PADDR  == 8'h20;
-    PWRITE == 1;
-    if(({oldPSEL,oldPENABLE} == 2'b11) || ({oldPSEL,oldPENABLE} == 2'b10))
+    PWRITE dist {1:/50 , 0:/50};
+    if(({PSEL,PENABLE} == 2'b11) || ({PSEL,PENABLE} == 2'b10))
     {   
-        PWDATA == oldPWDATA;            // PWDATA stable at setup and access states
+        PWDATA == oldPWDATA;
+        PADDR == oldPADDR;
+        PWRITE == oldPWRITE;
     }
     else{
         PWDATA[31:8] == 0;

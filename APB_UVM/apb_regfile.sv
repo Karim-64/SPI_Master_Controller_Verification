@@ -20,7 +20,7 @@
 `default_nettype none
 `timescale 1ns/1ps
 
-module apb_regfile_gm (
+module apb_regfile (
     input  wire         PCLK,
     input  wire         PRESETn,
 

@@ -19,6 +19,7 @@ class apb_access_test extends uvm_test;
     apb_status_sequence status_seq;
     apb_CLK_DIV_sequence clk_div_seq;
     apb_ss_ctrl_sequence ss_ctrl_seq;
+    apb_Delay_sequence delay_seq;
     virtual apb_if apb_vif;
 
 
@@ -36,6 +37,7 @@ class apb_access_test extends uvm_test;
         status_seq = apb_status_sequence::type_id::create("status_seq");
         clk_div_seq = apb_CLK_DIV_sequence::type_id::create("clk_div_seq");
         ss_ctrl_seq = apb_ss_ctrl_sequence::type_id::create("ss_ctrl_seq");
+        delay_seq = apb_Delay_sequence::type_id::create("delay_seq");
       if(!uvm_config_db #(virtual apb_if)::get(this,"","APB_IF",apb_cfg.apb_vif))
         `uvm_fatal("build_phase","Test - unable to get the virtual interface of the apb from the uvm_config_db")
       uvm_config_db #(apb_config)::set(this,"*","apb_CFG",apb_cfg);
@@ -53,9 +55,9 @@ class apb_access_test extends uvm_test;
           ctrl_seq.start(env.agent.sqr);
       `uvm_info("run_phase","ctrl_seq stimulus generation ended",UVM_LOW)
 
-      `uvm_info("run_phase","write_read_seq stimulus generation started",UVM_LOW)
-          write_read_seq.start(env.agent.sqr);
-      `uvm_info("run_phase","write_read_seq stimulus generation ended",UVM_LOW)
+       `uvm_info("run_phase","write_read_seq stimulus generation started",UVM_LOW)
+           write_read_seq.start(env.agent.sqr);
+       `uvm_info("run_phase","write_read_seq stimulus generation ended",UVM_LOW)
 
       `uvm_info("run_phase","status_seq stimulus generation started",UVM_LOW)
           status_seq.start(env.agent.sqr);
@@ -68,6 +70,10 @@ class apb_access_test extends uvm_test;
       `uvm_info("run_phase","ss_ctrl_seq stimulus generation started",UVM_LOW)
           ss_ctrl_seq.start(env.agent.sqr);
       `uvm_info("run_phase","ss_ctrl_seq stimulus generation ended",UVM_LOW)
+
+      `uvm_info("run_phase","delay_seq stimulus generation started",UVM_LOW)
+          delay_seq.start(env.agent.sqr);
+      `uvm_info("run_phase","delay_seq stimulus generation ended",UVM_LOW)
 
 
       phase.drop_objection(this);

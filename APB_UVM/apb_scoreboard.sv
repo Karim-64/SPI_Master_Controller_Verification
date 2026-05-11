@@ -33,64 +33,64 @@ package apb_scoreboard_pkg;
             forever begin  
                 sb_fifo.get(sb_seq_item);
                 /*check outputs*/
-                if(sb_seq_item.dut_PREADY !== sb_seq_item.PREADY) begin
-                    `uvm_error("run_phase", $sformatf("[SCOREBOARD_ERROR] PREADY - mismatch in predicted=%d vs observed=%d", sb_seq_item.PREADY, sb_seq_item.dut_PREADY));
+                if(sb_seq_item.PREADY !== sb_seq_item.PREADY_expected) begin
+                    `uvm_error("run_phase", $sformatf("[SCOREBOARD_ERROR] PREADY - mismatch in predicted_PREADY=%d vs observed_PREADY=%d", sb_seq_item.PREADY_expected, sb_seq_item.PREADY));
                     error_count++;
                 end
-                if(sb_seq_item.dut_PSLVERR !== sb_seq_item.PSLVERR) begin
-                    `uvm_error("run_phase", $sformatf("[SCOREBOARD_ERROR] PSLVERR - mismatch in predicted=%d vs observed=%d", sb_seq_item.PSLVERR, sb_seq_item.dut_PSLVERR));
+                if(sb_seq_item.PSLVERR !== sb_seq_item.PSLVERR_expected) begin
+                    `uvm_error("run_phase", $sformatf("[SCOREBOARD_ERROR] PSLVERR - mismatch in predicted_PSLVERR=%d vs observed_PSLVERR=%d", sb_seq_item.PSLVERR_expected, sb_seq_item.PSLVERR));
                     error_count++;
                 end
-                if(sb_seq_item.dut_cfg_en !== sb_seq_item.cfg_en) begin
-                    `uvm_error("run_phase", $sformatf("[SCOREBOARD_ERROR] cfg_en - mismatch in predicted=%d vs observed=%d", sb_seq_item.cfg_en, sb_seq_item.dut_cfg_en));
+                if(sb_seq_item.cfg_en !== sb_seq_item.cfg_en_expected) begin
+                    `uvm_error("run_phase", $sformatf("[SCOREBOARD_ERROR] cfg_en - mismatch in predicted_cfg_en=%d vs observed_cfg_en=%d", sb_seq_item.cfg_en_expected, sb_seq_item.cfg_en));
                     error_count++;
                 end
-                if(sb_seq_item.dut_cfg_mstr !== sb_seq_item.cfg_mstr) begin
-                    `uvm_error("run_phase", $sformatf("[SCOREBOARD_ERROR] cfg_mstr - mismatch in predicted=%d vs observed=%d", sb_seq_item.cfg_mstr, sb_seq_item.dut_cfg_mstr));
+                if(sb_seq_item.cfg_mstr !== sb_seq_item.cfg_mstr_expected) begin
+                    `uvm_error("run_phase", $sformatf("[SCOREBOARD_ERROR] cfg_mstr - mismatch in predicted_cfg_mstr=%d vs observed_cfg_mstr=%d", sb_seq_item.cfg_mstr_expected, sb_seq_item.cfg_mstr));
                     error_count++;
                 end
-                if(sb_seq_item.dut_cfg_lsb_first !== sb_seq_item.cfg_lsb_first) begin
-                    `uvm_error("run_phase", $sformatf("[SCOREBOARD_ERROR] cfg_lsb_first - mismatch in predicted=%d vs observed=%d", sb_seq_item.cfg_lsb_first, sb_seq_item.dut_cfg_lsb_first));
+                if(sb_seq_item.cfg_lsb_first !== sb_seq_item.cfg_lsb_first_expected) begin
+                    `uvm_error("run_phase", $sformatf("[SCOREBOARD_ERROR] cfg_lsb_first - mismatch in predicted_cfg_lsb_first=%d vs observed_cfg_lsb_first=%d", sb_seq_item.cfg_lsb_first_expected, sb_seq_item.cfg_lsb_first));
                     error_count++;
                 end
-                if(sb_seq_item.dut_cfg_loopback !== sb_seq_item.cfg_loopback) begin
-                    `uvm_error("run_phase", $sformatf("[SCOREBOARD_ERROR] cfg_loopback - mismatch in predicted=%d vs observed=%d", sb_seq_item.cfg_loopback, sb_seq_item.dut_cfg_loopback));
+                if(sb_seq_item.cfg_loopback !== sb_seq_item.cfg_loopback_expected) begin
+                    `uvm_error("run_phase", $sformatf("[SCOREBOARD_ERROR] cfg_loopback - mismatch in predicted_cfg_loopback=%d vs observed_cfg_loopback=%d", sb_seq_item.cfg_loopback_expected, sb_seq_item.cfg_loopback));
                     error_count++;
                 end
-                if(sb_seq_item.dut_tx_empty !== sb_seq_item.tx_empty) begin
-                    `uvm_error("run_phase", $sformatf("[SCOREBOARD_ERROR] tx_empty - mismatch in predicted=%d vs observed=%d", sb_seq_item.tx_empty, sb_seq_item.dut_tx_empty));
+                if(sb_seq_item.tx_empty !== sb_seq_item.tx_empty_expected) begin
+                    `uvm_error("run_phase", $sformatf("[SCOREBOARD_ERROR] tx_empty - mismatch in predicted_tx_empty=%d vs observed_tx_empty=%d", sb_seq_item.tx_empty_expected, sb_seq_item.tx_empty));
                     error_count++;
                 end
-                if(sb_seq_item.dut_IRQ !== sb_seq_item.IRQ) begin
-                    `uvm_error("run_phase", $sformatf("[SCOREBOARD_ERROR] IRQ - mismatch in predicted=%d vs observed=%d", sb_seq_item.IRQ, sb_seq_item.dut_IRQ));
+                if(sb_seq_item.IRQ !== sb_seq_item.IRQ_expected) begin
+                    `uvm_error("run_phase", $sformatf("[SCOREBOARD_ERROR] IRQ - mismatch in predicted_IRQ=%d vs observed_IRQ=%d", sb_seq_item.IRQ_expected, sb_seq_item.IRQ));
                     error_count++;
                 end
-                if(sb_seq_item.dut_cfg_mode !== sb_seq_item.cfg_mode) begin
-                    `uvm_error("run_phase", $sformatf("[SCOREBOARD_ERROR] cfg_mode - mismatch in predictede=%d vs observede=%d", sb_seq_item.cfg_mode, sb_seq_item.dut_cfg_mode));
+                if(sb_seq_item.cfg_mode !== sb_seq_item.cfg_mode_expected) begin
+                    `uvm_error("run_phase", $sformatf("[SCOREBOARD_ERROR] cfg_mode - mismatch in predicted_cfg_mode=%d vs observed_cfg_mode=%d", sb_seq_item.cfg_mode_expected, sb_seq_item.cfg_mode));
                     error_count++;
                 end
-                if(sb_seq_item.dut_cfg_width !== sb_seq_item.cfg_width) begin
-                    `uvm_error("run_phase", $sformatf("[SCOREBOARD_ERROR] cfg_width - mismatch in predicted_cfg=%d vs observed=%d", sb_seq_item.cfg_width, sb_seq_item.dut_cfg_width));
+                if(sb_seq_item.cfg_width !== sb_seq_item.cfg_width_expected) begin
+                    `uvm_error("run_phase", $sformatf("[SCOREBOARD_ERROR] cfg_width - mismatch in predicted_cfg_width=%d vs observed_cfg_width=%d", sb_seq_item.cfg_width_expected, sb_seq_item.cfg_width));
                     error_count++;
                 end
-                if(sb_seq_item.dut_SS_n !== sb_seq_item.SS_n) begin
-                    `uvm_error("run_phase", $sformatf("[SCOREBOARD_ERROR] SS_n - mismatch in predicted=%d vs observed=%d", sb_seq_item.SS_n, sb_seq_item.dut_SS_n));
+                if(sb_seq_item.SS_n !== sb_seq_item.SS_n_expected) begin
+                    `uvm_error("run_phase", $sformatf("[SCOREBOARD_ERROR] SS_n - mismatch in predicted_SS_n=%d vs observed_SS_n=%d", sb_seq_item.SS_n_expected, sb_seq_item.SS_n));
                     error_count++;
                 end
-                if(sb_seq_item.dut_cfg_delay !== sb_seq_item.cfg_delay) begin
-                    `uvm_error("run_phase", $sformatf("[SCOREBOARD_ERROR] cfg_delay - mismatch in predicted=%d vs observed=%d", sb_seq_item.cfg_delay, sb_seq_item.dut_cfg_delay));
+                if(sb_seq_item.cfg_delay !== sb_seq_item.cfg_delay_expected) begin
+                    `uvm_error("run_phase", $sformatf("[SCOREBOARD_ERROR] cfg_delay - mismatch in predicted_cfg_delay=%d vs observed_cfg_delay=%d", sb_seq_item.cfg_delay_expected, sb_seq_item.cfg_delay));
                     error_count++;
                 end
-                if(sb_seq_item.dut_cfg_clk_div !== sb_seq_item.cfg_clk_div) begin
-                    `uvm_error("run_phase", $sformatf("[SCOREBOARD_ERROR] cfg_clk_div - mismatch in predicted=%d vs observed=%d", sb_seq_item.cfg_clk_div, sb_seq_item.dut_cfg_clk_div));
+                if(sb_seq_item.cfg_clk_div !== sb_seq_item.cfg_clk_div_expected) begin
+                    `uvm_error("run_phase", $sformatf("[SCOREBOARD_ERROR] cfg_clk_div - mismatch in predicted_cfg_clk_div=%d vs observed_cfg_clk_div=%d", sb_seq_item.cfg_clk_div_expected, sb_seq_item.cfg_clk_div));
                     error_count++;
                 end
-                if(sb_seq_item.dut_tx_word !== sb_seq_item.tx_word) begin
-                    `uvm_error("run_phase", $sformatf("[SCOREBOARD_ERROR] tx_word - mismatch in predicted=%d vs observed=%d", sb_seq_item.tx_word, sb_seq_item.dut_tx_word));
+                if(sb_seq_item.tx_word !== sb_seq_item.tx_word_expected) begin
+                    `uvm_error("run_phase", $sformatf("[SCOREBOARD_ERROR] tx_word - mismatch in predicted_tx_word=%d vs observed_tx_word=%d", sb_seq_item.tx_word_expected, sb_seq_item.tx_word));
                     error_count++;
                 end
-                if(sb_seq_item.dut_PRDATA !== sb_seq_item.PRDATA) begin
-                    `uvm_error("run_phase", $sformatf("[SCOREBOARD_ERROR] PRDATA - mismatch in predicted=%d vs observed=%d", sb_seq_item.PRDATA, sb_seq_item.dut_PRDATA));
+                if(sb_seq_item.PRDATA !== sb_seq_item.PRDATA_expected) begin
+                    `uvm_error("run_phase", $sformatf("[SCOREBOARD_ERROR] PRDATA - mismatch in predicted_PRDATA=%d vs observed_PRDATA=%d", sb_seq_item.PRDATA_expected, sb_seq_item.PRDATA));
                     error_count++;
                 end
                 if (error_count == 0) begin
