@@ -1,0 +1,17 @@
+spi_core_shared_pkg.sv
+spi_core_interface.sv
+spi_core.sv
+spi_core_dut.sv
+spi_core_assertions.sv
+spi_core_sequence_item.sv
+spi_core_config.sv
+spi_core_driver.sv
+spi_core_sequencer.sv
+spi_core_sequence.sv
+spi_core_monitor.sv
+spi_core_scoreboard.sv
+spi_core_coverage.sv
+spi_core_agent.sv
+spi_core_env.sv
+spi_core_test.sv
+spi_core_top.sv
